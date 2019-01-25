@@ -5,6 +5,9 @@ class Graph(object):
     def __init__(self):
         self._graph = defaultdict(set)
 
+    def getConnections(self, node):
+        return self._graph[node]
+
     def addConnection(self, node1, node2):
         self._graph[node1].add(node2)
         self._graph[node2].add(node1)
