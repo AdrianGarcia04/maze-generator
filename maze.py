@@ -74,5 +74,29 @@ class Maze:
         for cell in self.cells:
             cell.draw(pygame, canvas)
 
+    def genUpdateRect(self, refCell, direction):
+        # The reference cell is always oriented upwards
+        p1, p2, p3 = refCell.points
+
+        x = y = width = heigth = 0
+
+        if direction == 'left':
+            x = p1[0] - 5
+            y = p3[1] - 5
+            width = p3[0] - x + 5
+            heigth = p1[1] - y + 5
+        elif direction == 'bottom':
+            x = p1[0] - 5
+            y = p1[1] - 5
+            width = p2[0] - x + 5
+            heigth = 10
+        elif direction == 'right':
+            x = p3[0] - 5
+            y = p3[1] - 5
+            width = p2[0] - x + 5
+            heigth = p2[1] - y + 5
+
+        return (x, y, width, heigth)
+
     def makeEntranceAndExit(self, pygame, canvas):
         self.cells[0].removeWall('left')

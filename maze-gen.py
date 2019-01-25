@@ -3,8 +3,8 @@ import argparse
 import pygame
 import random
 
-mazeWidth = 14
-mazeHeigth = 10
+mazeWidth = 50
+mazeHeigth = 30
 
 cellsWidth = 30
 cellsHeigth = 30
@@ -32,25 +32,28 @@ def main(args):
     currentCell.currentCell = True
     genMaze.visitCell(currentCell)
 
-    crashed = False
+    updateRect = pygame.Rect(0, 0, canvasWidth, canvasHeigth)
 
-    state = ([], currentCell)
+    done = False
+
+    state = ([], currentCell, updateRect)
     genMaze.draw(pygame, canvas)
 
-    while not crashed:
+    while not done:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                crashed = True
-            if genMaze.existsUnvisitedCells():
+                done = True
+
+            # While there are unvisited cells
+            if state:
                 state = backtrack(genMaze, pygame, canvas, state)
-                pygame.display.update()
+                pygame.display.update(updateRect)
             else:
-                crashed = True
+                done = True
                 pygame.image.save(canvas, './output.jpg')
 
 
-def backtrack(maze, pygame, canvas, (stackOfCells, currentCell)):
-    # While there are unvisited cells
+def backtrack(maze, pygame, canvas, (stackOfCells, currentCell, updateRect)):
     if maze.existsUnvisitedCells():
 
         neighbours = maze.neighbours(currentCell)
@@ -69,22 +72,28 @@ def backtrack(maze, pygame, canvas, (stackOfCells, currentCell)):
                 if currentCell.index - 1 == randomNeighbour.index:
                     currentCell.removeWall('left')
                     randomNeighbour.removeWall('left')
+                    updateRect = maze.genUpdateRect(currentCell, 'left')
                 elif currentCell.index + mazeWidth == randomNeighbour.index:
                     currentCell.removeWall('bottom')
                     randomNeighbour.removeWall('bottom')
+                    updateRect = maze.genUpdateRect(currentCell, 'bottom')
                 else:
                     currentCell.removeWall('right')
                     randomNeighbour.removeWall('right')
+                    updateRect = maze.genUpdateRect(currentCell, 'right')
             else:
                 if currentCell.index + 1 == randomNeighbour.index:
                     currentCell.removeWall('left')
                     randomNeighbour.removeWall('left')
+                    updateRect = maze.genUpdateRect(randomNeighbour, 'left')
                 elif currentCell.index - mazeWidth == randomNeighbour.index:
                     currentCell.removeWall('bottom')
                     randomNeighbour.removeWall('bottom')
+                    updateRect = maze.genUpdateRect(randomNeighbour, 'bottom')
                 else:
                     currentCell.removeWall('right')
                     randomNeighbour.removeWall('right')
+                    updateRect = maze.genUpdateRect(randomNeighbour, 'right')
 
             # Draw cells
             currentCell.draw(pygame, canvas)
@@ -95,11 +104,14 @@ def backtrack(maze, pygame, canvas, (stackOfCells, currentCell)):
             currentCell = randomNeighbour
             currentCell.currentCell = True
             maze.visitCell(currentCell)
+            updateRect = pygame.Rect(updateRect)
 
         elif stackOfCells:
             cell = stackOfCells.pop()
             currentCell = cell
             currentCell.poped = True
-    return (stackOfCells, currentCell)
+        return (stackOfCells, currentCell, updateRect)
+    else:
+        return None
 
 main(defineArgs())
