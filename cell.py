@@ -20,14 +20,14 @@ class Cell:
                     canvas,
                     (255, 255, 255),
                     [initialPoint, finalPoint],
-                     2
+                     1
                 )
             else:
                 pygame.draw.polygon(
                     canvas,
                     (0, 0, 0),
                     [initialPoint, finalPoint],
-                    4
+                    1
                 )
 
     def changeOrientation(self):

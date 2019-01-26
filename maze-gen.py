@@ -3,29 +3,76 @@ import argparse
 import pygame
 import random
 
-mazeWidth = 50
-mazeHeigth = 30
-
-cellsWidth = 30
-cellsHeigth = 30
-
-canvasWidth = mazeWidth * (cellsWidth / 2) + 40
-canvasHeigth = mazeHeigth * cellsHeigth + 10
-
 def defineArgs():
     parser = argparse.ArgumentParser(
         description='simple script to generate random mazes'
     )
 
+    parser.add_argument(
+        '-mw', '--mazeWidth',
+        help='maze width',
+        type=int,
+        default=10,
+    )
+
+    parser.add_argument(
+        '-mh', '--mazeHeight',
+        help='maze heigth',
+        type=int,
+        default=10,
+    )
+
+    parser.add_argument(
+        '-cw', '--cellWidth',
+        help='cells width',
+        type=int,
+        default=30,
+    )
+
+    parser.add_argument(
+        '-ch', '--cellHeight',
+        help='cells heigth',
+        type=int,
+        default=30,
+    )
+
+    parser.add_argument(
+        '-steps',
+        help='show maze generation step by step',
+        action='store_false'
+    )
+
+    action = parser.add_mutually_exclusive_group()
+    action.add_argument(
+        '-o', '--output',
+        help='save maze image in specified route',
+        default='output.jpg',
+    )
+
+    action.add_argument(
+        '-s', '--show',
+        help='show maze on screen',
+        action='store_true'
+    )
+
     return parser.parse_args()
 
 def main(args):
-    genMaze = maze.Maze((mazeWidth, mazeHeigth), (cellsWidth, cellsHeigth))
 
+    # Get canvas dimensions based on cells width and heigth
+    canvasWidth = args.mazeWidth * (args.cellWidth / 2) + 30
+    canvasHeigth = args.mazeHeight * args.cellHeight + 10
+
+    # Generate maze
+    genMaze = maze.Maze(
+                (args.mazeWidth, args.mazeHeight),
+                (args.cellWidth, args.cellHeight)
+            )
+
+    # Pygame setup
     pygame.init()
     canvas = pygame.display.set_mode((canvasWidth, canvasHeigth))
     pygame.display.set_caption('Maze generator')
-
 
     # Choose a random cell and mark it as visited
     currentCell = random.choice(genMaze.cells)
@@ -44,14 +91,14 @@ def main(args):
             if event.type == pygame.QUIT:
                 done = True
 
-            # While there are unvisited cells
-            if state:
-                state = backtrack(genMaze, pygame, canvas, state)
-                pygame.display.update(updateRect)
-            else:
-                done = True
-                pygame.image.save(canvas, './output.jpg')
+        if state:
+            state = backtrack(genMaze, pygame, canvas, state)
+            pygame.display.update(updateRect)
+        else:
+            done = True
 
+    if args.show is False:
+        pygame.image.save(canvas, args.output or './output.jpg')
 
 def backtrack(maze, pygame, canvas, (stackOfCells, currentCell, updateRect)):
     if maze.existsUnvisitedCells():
@@ -73,7 +120,7 @@ def backtrack(maze, pygame, canvas, (stackOfCells, currentCell, updateRect)):
                     currentCell.removeWall('left')
                     randomNeighbour.removeWall('left')
                     updateRect = maze.genUpdateRect(currentCell, 'left')
-                elif currentCell.index + mazeWidth == randomNeighbour.index:
+                elif currentCell.index + maze.width == randomNeighbour.index:
                     currentCell.removeWall('bottom')
                     randomNeighbour.removeWall('bottom')
                     updateRect = maze.genUpdateRect(currentCell, 'bottom')
@@ -86,7 +133,7 @@ def backtrack(maze, pygame, canvas, (stackOfCells, currentCell, updateRect)):
                     currentCell.removeWall('left')
                     randomNeighbour.removeWall('left')
                     updateRect = maze.genUpdateRect(randomNeighbour, 'left')
-                elif currentCell.index - mazeWidth == randomNeighbour.index:
+                elif currentCell.index - maze.width == randomNeighbour.index:
                     currentCell.removeWall('bottom')
                     randomNeighbour.removeWall('bottom')
                     updateRect = maze.genUpdateRect(randomNeighbour, 'bottom')

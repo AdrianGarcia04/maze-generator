@@ -3,9 +3,9 @@ import cell
 
 class Maze:
 
-    def __init__(self, (cols, rows), (cellWidth, cellHeigth)):
-        self.cols = cols
-        self.rows = rows
+    def __init__(self, (width, heigth), (cellWidth, cellHeigth)):
+        self.width = width
+        self.heigth = heigth
         self.cellWidth = cellWidth
         self.cellHeigth = cellHeigth
         self.cellsGraph = graph.Graph()
@@ -13,8 +13,8 @@ class Maze:
         self.cellsVisited = 0
 
         i = 0
-        for row in range(0, rows):
-            for col in range(0, cols):
+        for row in range(0, heigth):
+            for col in range(0, width):
                 x = (cellWidth / 2) * col
                 y = cellHeigth * (row + 1)
                 newCell = cell.Cell((
@@ -41,8 +41,8 @@ class Maze:
                 if i + 1 < len(self.cells) and not self.cells[i + 1].orientedUp:
                     cellToConnect = self.cells[i + 1]
                     self.cellsGraph.addConnection(currentCell, cellToConnect)
-                if i + self.cols < len(self.cells):
-                    cellToConnect = self.cells[i + self.cols]
+                if i + self.width < len(self.cells):
+                    cellToConnect = self.cells[i + self.width]
                     self.cellsGraph.addConnection(currentCell, cellToConnect)
 
     def existsUnvisitedCells(self):
