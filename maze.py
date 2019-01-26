@@ -130,3 +130,32 @@ class Maze:
         startCell.asStart(pygame, canvas)
         goalCell.asGoal(pygame, canvas)
         pygame.display.update()
+
+    def asJSON(self):
+        file = open('maze.json', 'w')
+        text = '{\n'
+        cells = 0
+        for cell in self.cells:
+
+            neighbours = []
+            for neighbour in self.neighbours(cell):
+                neighbours.append(neighbour.index)
+
+            neighboursAsString = '\"neighbours\": ['
+            for neighbour in neighbours:
+                if neighbour != neighbours[-1]:
+                    neighboursAsString += str(neighbour) + ','
+                else:
+                    neighboursAsString += str(neighbour) + ']'
+
+            cellInfo = str(cell)
+            if cell != self.cells[-1]:
+                cellInfo = str(cell) + ','
+
+            cellInfo = cellInfo.replace('cell', 'cell' + str(cells))
+            text += cellInfo.replace('--neighbours--', neighboursAsString) + '\n'
+            cells += 1
+
+        text += '}'
+        file.write(text)
+        file.close()

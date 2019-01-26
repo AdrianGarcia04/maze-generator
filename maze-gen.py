@@ -31,9 +31,15 @@ def defineArgs():
 
     parser.add_argument(
         '-ch', '--cellHeight',
-        help='cells heigth',
+        help='cells height',
         type=int,
         default=30,
+    )
+
+    parser.add_argument(
+        '-json',
+        help='creates a representation of the maze in json format',
+        action='store_true'
     )
 
     action1 = parser.add_mutually_exclusive_group()
@@ -106,11 +112,14 @@ def main(args):
 
     if args.exits is True:
         genMaze.makeEntranceAndExit(pygame, canvas)
-    elif args.goals is True:
+    elif args.goal is True:
         genMaze.makeGoal(pygame, canvas)
 
     if args.show is False:
         pygame.image.save(canvas, args.output or './output.jpg')
+
+    if args.json is True:
+        genMaze.asJSON()
 
 def backtrack(maze, pygame, canvas, (stackOfCells, currentCell, updateRect)):
     if maze.existsUnvisitedCells():

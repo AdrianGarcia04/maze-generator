@@ -94,4 +94,27 @@ class Cell:
 
     def __str__(self):
         p1, p2, p3 = self.points
-        return '{} = ({}, {}, {}) - O: {}'.format(self.index, p1, p2, p3, self.orientedUp)
+        leftWall = self.walls['left'][1]
+        bottomWall = self.walls['bottom'][1]
+        rightWall = self.walls['right'][1]
+
+        cellInfo = """ \"cell\": {{
+            \"index\": {0},
+            \"points\": {{
+                \"p1\": \"{1}\",
+                \"p2\": \"{2}\",
+                \"p3\": \"{3}\"
+            }},
+            \"walls\": {{
+                \"left\": {4},
+                \"bottom\": {5},
+                \"right\": {6}
+            }},
+            --neighbours--
+        }}"""
+        cellInfo = " ".join(cellInfo.split())
+        cellInfo = cellInfo.format(
+                    self.index,
+                    p1, p2, p3,
+                    int(leftWall), int(bottomWall), int(rightWall))
+        return cellInfo
