@@ -36,20 +36,27 @@ def defineArgs():
         default=30,
     )
 
-    parser.add_argument(
-        '-steps',
-        help='show maze generation step by step',
-        action='store_false'
+    action1 = parser.add_mutually_exclusive_group()
+    action1.add_argument(
+        '-exits',
+        help='whether or not the maze has an entrance and exit',
+        action='store_true'
     )
 
-    action = parser.add_mutually_exclusive_group()
-    action.add_argument(
+    action1.add_argument(
+        '-goal',
+        help='whether or not the maze has a start and a goal',
+        action='store_true'
+    )
+
+    action2 = parser.add_mutually_exclusive_group()
+    action2.add_argument(
         '-o', '--output',
         help='save maze image in specified route',
         default='output.jpg',
     )
 
-    action.add_argument(
+    action2.add_argument(
         '-s', '--show',
         help='show maze on screen',
         action='store_true'
@@ -96,6 +103,11 @@ def main(args):
             pygame.display.update(updateRect)
         else:
             done = True
+
+    if args.exits is True:
+        genMaze.makeEntranceAndExit(pygame, canvas)
+    elif args.goals is True:
+        genMaze.makeGoal(pygame, canvas)
 
     if args.show is False:
         pygame.image.save(canvas, args.output or './output.jpg')
@@ -147,9 +159,7 @@ def backtrack(maze, pygame, canvas, (stackOfCells, currentCell, updateRect)):
             randomNeighbour.draw(pygame, canvas)
 
             # Make the neighbour the current cell and mark it as visited
-            currentCell.currentCell = False
             currentCell = randomNeighbour
-            currentCell.currentCell = True
             maze.visitCell(currentCell)
             updateRect = pygame.Rect(updateRect)
 

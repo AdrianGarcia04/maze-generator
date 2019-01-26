@@ -1,5 +1,6 @@
 import graph
 import cell
+import random
 
 class Maze:
 
@@ -99,4 +100,33 @@ class Maze:
         return (x, y, width, heigth)
 
     def makeEntranceAndExit(self, pygame, canvas):
-        self.cells[0].removeWall('left')
+        entranceCell = random.choice(self.cells[0:self.width])
+
+        while entranceCell.orientedUp:
+            entranceCell = random.choice(self.cells[0:self.width])
+        entranceCell.removeWall('bottom')
+
+        entranceRect = self.genUpdateRect(entranceCell, 'bottom')
+        entranceCell.draw(pygame, canvas)
+
+        exitCell = random.choice(self.cells[len(self.cells) - self.width:len(self.cells)])
+
+        while not exitCell.orientedUp:
+            exitCell = random.choice(self.cells[len(self.cells) - self.width:len(self.cells)])
+        exitCell.removeWall('bottom')
+
+        exitRect = self.genUpdateRect(exitCell, 'bottom')
+        exitCell.draw(pygame, canvas)
+
+        pygame.display.update([entranceRect, exitRect])
+
+    def makeGoal(self, pygame, canvas):
+        startCell = random.choice(self.cells)
+        goalCell = random.choice(self.cells)
+
+        startCell.status = 'start'
+        goalCell.status = 'goal'
+
+        startCell.asStart(pygame, canvas)
+        goalCell.asGoal(pygame, canvas)
+        pygame.display.update()
